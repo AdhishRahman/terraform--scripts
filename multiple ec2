@@ -1,0 +1,40 @@
+terraform {
+  required_providers {
+    aws = {
+      source  = "hashicorp/aws"
+      version = "~> 5.0"
+    }
+  }
+}
+# Configure the AWS Provider
+provider "aws" {
+  region = "ap-south-1"
+}
+
+
+module "ec2_instance" {
+  source  = "terraform-aws-modules/ec2-instance/aws"
+
+  for_each = {
+    "jenkins"  = "t2.medium"
+    "monitoring" = "t2.micro"
+    "production-server" = "t2.micro"
+  }
+
+  name = "instance-${each.key}"
+
+  instance_type          = each.value
+  ami                    = "ami-09b0a86a2c84101e1"
+  key_name               = "PPKEY"
+  monitoring             = true
+  vpc_security_group_ids = ["sg-0f8076fd890620948"]
+  subnet_id              = "subnet-0e517eeb03fb5cee0"
+
+  tags = {
+    Terraform   = "true"
+    Environment = "dev"
+  }
+}
+~
+~
+~
